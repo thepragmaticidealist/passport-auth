@@ -38,7 +38,7 @@ app.use(bodyParser.urlencoded({
   extended : true
 }));
 
-/*
+
 // For flash messages, optional if implentation not for browser
 app.use(session({
   secret: 'Quis custodiet ipsos custodes'
@@ -51,7 +51,6 @@ app.set('view engine', 'ejs');
 // For passport
 app.use(passport.initialize());
 app.use(passport.session());
-*/
 
 // Initialise routes
 router(app, passport); // load our routes and pass in our app and fully configured passport
