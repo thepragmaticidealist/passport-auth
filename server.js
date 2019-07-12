@@ -25,8 +25,8 @@ mongoose.connect(configDB.url, {
 });
 
 // Pass passport into config function for it to be configured
-// const passportConfig = require('./config/passport');
-// passportConfig(passport);
+const passportConfig = require('./config/passport');
+passportConfig(passport);
 
 // Request logging
 if (environment !== 'production') {
@@ -41,14 +41,16 @@ app.use(bodyParser.urlencoded({
 
 // For flash messages, optional if implentation not for browser
 app.use(session({
-  secret: 'Quis custodiet ipsos custodes'
+  secret: 'Quis custodiet ipsos custodes',
+  resave: false,
+  saveUninitialized: false
 }))
 app.use(cookieParser());
 app.use(flash()); // Special area of the session used for storing messages, i.e. flash messages stores in session
 
 app.set('view engine', 'ejs');
 
-// For passport
+// Initialize passport with persistent login sessions
 app.use(passport.initialize());
 app.use(passport.session());
 
