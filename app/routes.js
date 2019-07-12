@@ -10,15 +10,21 @@ module.exports = (app, passport) => {
   app.get('/login', (req, res, next) => {
     // all requests will have a req.flash()
     // pass a local variable i.e. the login flash message to the view
-    res.render('login.ejs', { message: req.flash('loginMessage') });
+    res.render('login.ejs', { 
+      message: req.flash('loginMessage') 
+    });
   });
 
-  /*
   // Handle post requests to /login
   // Use passport local strategy as middleware
-  app.post('/login', // passport auth middleware
+  app.post('/login', 
+  // passport auth middleware
+    passport.authenticate('local-login', {
+      successRedirect: '/profile',
+      failureRedirect: '/signup',
+      failureFlash: true
+    })
   );
-  */
 
   app.get('/signup', (req, res, next) => {
     // render the page and pass in any flash data if it exists
@@ -27,11 +33,14 @@ module.exports = (app, passport) => {
     });
   });
 
-  /*
   app.post('/signup',
   // Passport sign up flow
+  passport.authenticate('local-signup', {
+    successRedirect: '/profile',
+    failureRedirect: '/signup',
+    failureFlash: true
+  })
   );
-  */
 
   // Only allow logged in users to visit/get this page
   // We use the middleware function authenticationCheck to evaluate this
