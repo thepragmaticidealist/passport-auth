@@ -10,32 +10,27 @@ const userSchema = new Schema({
   local: {
     email: {
         type: 'String',
-        required: true,
         trim: true,
         unique: true
     },
     password: {
       type: 'String',
-      required: true,
       trim: true
     }
   },
   google: {
     id: {
       type: 'String',
-      required: true,
       trim: true,
       unique: true
     },
     token: {
       type: 'String',
-      required: true,
       trim: true,
       unique: true
     },
     email: {
       type: 'String',
-      required: true,
       trim: true,
       unique: true
     },
@@ -46,19 +41,16 @@ const userSchema = new Schema({
   facebook: {
     id: {
       type: 'String',
-      required: true,
       trim: true,
       unique: true
     },
     token: {
       type: 'String',
-      required: true,
       trim: true,
       unique: true
     },
     email: {
       type: 'String',
-      required: true,
       trim: true,
       unique: true
     },
@@ -69,19 +61,16 @@ const userSchema = new Schema({
   twitter: {
     id: {
       type: 'String',
-      required: true,
       trim: true,
       unique: true
     },
     token: {
       type: 'String',
-      required: true,
       trim: true,
       unique: true
     },
     email: {
       type: 'String',
-      required: true,
       trim: true,
       unique: true
     },
@@ -110,8 +99,8 @@ userSchema.pre('save', function (next) {
   }
 });
 
-// Validate password
-userSchema.methods.validatePassword = function (password) {
+// Returns a promise that resolves to true if a password is valid
+userSchema.methods.validPassword = function (password) {
   return bcrypt.compare(password, this.local.password);
 }
 
