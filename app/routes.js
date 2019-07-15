@@ -1,9 +1,9 @@
 // Route managing niddleware function
 
 module.exports = (app, passport) => {
-  // Home
+
   app.get('/', (req, res, next) => {
-    res.render('index.ejs')
+    res.render('index.ejs');
   });
 
   // Handle get requests to /login
@@ -11,7 +11,7 @@ module.exports = (app, passport) => {
     // all requests will have a req.flash()
     // pass a local variable i.e. the login flash message to the view
     res.render('login.ejs', { 
-      message: req.flash('loginMessage') 
+      message: req.flash('loginMessage')
     });
   });
 
@@ -21,7 +21,7 @@ module.exports = (app, passport) => {
   // passport auth middleware
     passport.authenticate('local-login', {
       successRedirect: '/profile',
-      failureRedirect: '/signup',
+      failureRedirect: '/login',
       failureFlash: true
     })
   );
@@ -39,7 +39,7 @@ module.exports = (app, passport) => {
     successRedirect: '/profile',
     failureRedirect: '/signup',
     failureFlash: true
-  })
+    })
   );
 
   // Only allow logged in users to visit/get this page
@@ -52,7 +52,7 @@ module.exports = (app, passport) => {
 
   app.get('/logout', (req, res, next) => {
     req.logout(); // Provided by passport
-    res.redirect('/login');
+    res.redirect('/');
   });
 }
 /**

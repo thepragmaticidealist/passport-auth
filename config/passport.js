@@ -68,16 +68,13 @@ module.exports = function (passport) {
   },
   function (req, email, password, done) {
       // Find a user with an email = email
-      console.log('email', email)
       User.findOne({ 'local.email': email }, async (err, user) => {
-        console.log('....', user)
         if (err) {
           console.log('Error finding user', err);
           return done(err);
         } else {
-          // If no user,
+          // If no user found with that email,
           if (!user) {
-            console.log('>>>>>>')
             return done(null, false, req.flash('loginMessage', 'No user found with that email.'));
           } else {
             // Compare passwords
@@ -97,6 +94,4 @@ module.exports = function (passport) {
       })
     })
   )
-
-
 }
