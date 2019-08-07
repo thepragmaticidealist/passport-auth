@@ -22,7 +22,7 @@ module.exports = (app, passport) => {
     passport.authenticate('local-login', {
       successRedirect: '/profile',
       failureRedirect: '/login',
-      failureFlash: true
+      failureFlash: true // Flash error message given by the verify callback
     })
   );
 
@@ -46,7 +46,7 @@ module.exports = (app, passport) => {
   // We use the middleware function authenticationCheck to evaluate this
   app.get('/profile', authenticationCheck, (req, res, next) => {
     res.render('profile.ejs', {
-      user: req.user
+      user: req.user // Pass authenticated user from passport to our profile page template
     });
   });
 
@@ -54,6 +54,27 @@ module.exports = (app, passport) => {
     req.logout(); // Provided by passport
     res.redirect('/');
   });
+
+  // Redirect the user to fb for authentication
+  app.get('/auth/facebook', 
+    passport.authenticate('facebook',
+    {
+      // We need additional permission for profile info
+      // so we pass in the scope option
+      scope: ['public_profile', 'email'],
+      // re-ask for for declined permissions
+      authType: 'reauthenticate'
+    })
+  );
+
+  // Redirect URL we passed to passport facebook strategy middleware
+  app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', {
+      successRedirect: '/profile',
+      failureRedirect: '/',
+      failureFlash: true
+    })
+  )
 }
 /**
  * Middleware to check whether a user is authenticated

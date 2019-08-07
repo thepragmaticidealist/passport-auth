@@ -1,5 +1,7 @@
 const LocalStrategy = require('passport-local').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const User = require('../app/models/user');
+const facebookAuth = require('../config/auth').facebook
 
 
 module.exports = function (passport) {
@@ -11,6 +13,7 @@ module.exports = function (passport) {
   // passport attaches data passed to done fx in req.session.passport.user
   // i.e. req.session.passport.user = { id: 123 }
   passport.serializeUser(function (user, done) {
+    // Save user id in session
     done(null, user.id)
   });
   // retrieve user id from session, attach id to req.user object
@@ -75,6 +78,7 @@ module.exports = function (passport) {
         } else {
           // If no user found with that email,
           if (!user) {
+            // done(err, user, optionalmessage)
             return done(null, false, req.flash('loginMessage', 'No user found with that email.'));
           } else {
             // Compare passwords
@@ -82,11 +86,11 @@ module.exports = function (passport) {
             // Password isn't valid, no dice
             // We're calling the validPassword method attached to the document
             const passwordIsValid = await user.validPassword(password);
-            console.log('passwordIsValid', passwordIsValid)
             if (!passwordIsValid) {
               return done(null, false, req.flash('loginMessage', 'Wrong password.'));
             } else {
-              // Success, pass user to passport
+              // Success, pass user to passport to attach to req.user
+              // User passed to serializeUser fx to authenticate succeeding requests
               return done(null, user);
             }
           }
@@ -94,4 +98,38 @@ module.exports = function (passport) {
       })
     })
   )
+
+  passport.use('facebook', new FacebookStrategy(
+    facebookAuth,
+    function (accessToken, refreshToken, profile, done) {
+      User.findOne({ 'facebook.id' : profile.id }, (err, user) => {
+        if (err) {
+          return done(err);
+        } else {
+          if (user) {
+            return done(null, user);
+          } else {
+            // Create the user
+            //http://www.passportjs.org/docs/profile/
+            const { id, name, emails } = profile;
+            const user = {
+              facebook : {
+              id,
+              token: accessToken,
+              email: emails[0].value,
+              name: `${name.givenName} ${name.familyName}`
+            }}
+            const newUser = new User(user);
+            newUser.save((err, user) => {
+              if (err) {
+                return done(err);
+              } else {
+                return done(null, newUser)
+              }
+            })
+          }
+        }
+      })
+    }
+  ))
 }

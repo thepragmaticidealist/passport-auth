@@ -1,2 +1,4 @@
 passportlocal.mkd
+passportfacebook.mkd
 node_modules
+.env

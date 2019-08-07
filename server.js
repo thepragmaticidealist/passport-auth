@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express');
 const mongoose = require('mongoose'); // connect to db
 const passport = require('passport'); // auth middleware
@@ -9,7 +11,8 @@ const bodyParser = require('body-parser'); // middleware that adds body object t
 const session = require('express-session'); // session setup to store flash messages
 
 const app = express();
-const router = require('./app/routes.js')
+const router = require('./app/routes.js');
+
 const environment = process.env.NODE_ENV;
 const PORT = process.env.PORT || 8000;
 const configDB = require('./config/database');
@@ -50,8 +53,9 @@ app.use(flash()); // Special area of the session used for storing messages, i.e.
 
 app.set('view engine', 'ejs');
 
-// Initialize passport with persistent login sessions
+// Initialise passport for express
 app.use(passport.initialize());
+// Setup passport with persistent login sessions
 app.use(passport.session());
 
 // Initialise routes

@@ -9,30 +9,23 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   local: {
     email: {
-        type: 'String',
-        trim: true,
-        unique: true
+      type: 'String',
+      trim: true,
+      unique: true
     },
     password: {
-      type: 'String',
-      trim: true
+      type: 'String'
     }
   },
   google: {
     id: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     token: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     email: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     name: {
       type: 'String'
@@ -40,19 +33,13 @@ const userSchema = new Schema({
   },
   facebook: {
     id: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     token: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     email: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     name: {
       type: 'String'
@@ -60,31 +47,26 @@ const userSchema = new Schema({
   },
   twitter: {
     id: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     token: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     email: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     name: {
       type: 'String'
     }
   },
-  
 });
 
 // encrypt password before save
 userSchema.pre('save', function (next) {
   const user = this;
-  if (!user.isModified || !user.isNew) { // don't rehash if it's an old user
+  if (!user.isModified || !user.isNew) { // Don't rehash if it's an old user
+    next();
+  } else if (!user.hasOwnProperty('local')) { // Don't hash if the user is local
     next();
   } else {
     bcrypt.hash(user.local.password, saltingRounds, function (err, hash) {
