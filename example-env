@@ -1,0 +1,4 @@
+MONGO_DEV_URL=urlhere
+FACEBOOK_CLIENT_ID=appclientidhere
+FACEBOOK_CLIENT_SECRET=clientsecrethere
+FACEBOOK_CALLBACK_URL=callbackurlstringhere

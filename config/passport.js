@@ -1,7 +1,7 @@
 const LocalStrategy = require('passport-local').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const User = require('../app/models/user');
-const facebookAuth = require('../config/auth').facebook
+const facebookAuth = require('../config/auth').facebook;
 
 
 module.exports = function (passport) {
@@ -124,7 +124,7 @@ module.exports = function (passport) {
               if (err) {
                 return done(err);
               } else {
-                return done(null, newUser)
+                return done(null, newUser);
               }
             })
           }
