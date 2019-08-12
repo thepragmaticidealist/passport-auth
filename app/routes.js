@@ -55,7 +55,7 @@ module.exports = (app, passport) => {
     res.redirect('/');
   });
 
-  // Redirect the user to fb for authentication
+  // Send the user to fb for authentication
   app.get('/auth/facebook', 
     passport.authenticate('facebook',
     {
@@ -74,8 +74,30 @@ module.exports = (app, passport) => {
       failureRedirect: '/',
       failureFlash: true
     })
-  )
+  );
+
+   // Send the user to google for authentication
+   app.get('/auth/google',
+     passport.authenticate('google', {
+       // We need data from the user's profile
+       // so we pass in the scope option
+      //  scope: ['https://www.googleapis.com/auth/plus.login', 'email']
+       scope: ['profile', 'email']
+     })
+   );
+
+   // Redirect URL we passed to passport google strategy middleware
+   app.get('/auth/google/callback',
+     passport.authenticate('google', {
+       successRedirect: '/profile',
+       failureRedirect: '/',
+       failureFlash: true
+     })
+   )
 }
+
+
+
 /**
  * Middleware to check whether a user is authenticated
  * If authenticated, the method passes control to the next handler

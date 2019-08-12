@@ -2,6 +2,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const User = require('../app/models/user');
 const facebookAuth = require('../config/auth').facebook;
+const googleAuth = require('../config/auth').google;
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 
 module.exports = function (passport) {
@@ -128,6 +130,37 @@ module.exports = function (passport) {
               }
             })
           }
+        }
+      })
+    }
+  ))
+
+  passport.use('google', new GoogleStrategy(
+    googleAuth,
+    function (accessToken, refreshToken, profile, done) {
+      User.findOne({'google.id': profile.id }, (err, user) => {
+        if (err) {
+          return done(err);
+        } else if (user) {
+          return done(null, user);
+        } else {
+          const { id, displayName, emails } = profile;
+          const user = {
+            google: {
+              id,
+              token: accessToken,
+              email: emails[0].value,
+              name: `${displayName}`
+            }
+          };
+          const newUser = new User(user);
+          newUser.save((err, user) => {
+            if (err) {
+              return done(err);
+            } else {
+              return done(null, newUser);
+            }
+          })
         }
       })
     }

@@ -2,3 +2,6 @@ MONGO_DEV_URL=urlhere
 FACEBOOK_CLIENT_ID=appclientidhere
 FACEBOOK_CLIENT_SECRET=clientsecrethere
 FACEBOOK_CALLBACK_URL=callbackurlstringhere
+GOOGLE_CLIENT_ID=appclientidhere
+GOOGLE_CLIENT_SECRET=clientsecrethere
+GOOGLE_CALLBACK_URL=callbackurlstringhere

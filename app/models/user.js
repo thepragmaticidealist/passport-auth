@@ -9,9 +9,7 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   local: {
     email: {
-      type: 'String',
-      trim: true,
-      unique: true
+      type: 'String'
     },
     password: {
       type: 'String'

@@ -1,4 +1,7 @@
 passportlocal.mkd
 passportfacebook.mkd
+passportgoogle.mkd
+passportgithub.mkd
+linkingaccounts.mkd
 node_modules
 .env

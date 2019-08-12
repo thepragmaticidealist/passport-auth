@@ -6,7 +6,9 @@ module.exports = {
     profileURL: 'https://graph.facebook.com/v4.0/me?fields=first_name,last_name,email'
   },
   google: {
-    callbackURL: 'http://localhost:8000/auth/google/callback'
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
   },
   github: {
 
