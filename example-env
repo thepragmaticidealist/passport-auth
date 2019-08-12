@@ -5,3 +5,6 @@ FACEBOOK_CALLBACK_URL=callbackurlstringhere
 GOOGLE_CLIENT_ID=appclientidhere
 GOOGLE_CLIENT_SECRET=clientsecrethere
 GOOGLE_CALLBACK_URL=callbackurlstringhere
+GITHUB_CLIENT_ID=appclientidhere
+GITHUB_CLIENT_SECRET=clientsecrethere
+GITHUB_CALLBACK_URL=callbackurlstringhere

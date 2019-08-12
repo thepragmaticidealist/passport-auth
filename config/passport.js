@@ -1,9 +1,13 @@
 const LocalStrategy = require('passport-local').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
-const User = require('../app/models/user');
-const facebookAuth = require('../config/auth').facebook;
-const googleAuth = require('../config/auth').google;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const GithubStrategy = require('passport-github').Strategy;
+const {
+  facebookAuth,
+  googleAuth,
+  githubAuth
+} = require('../config/auth');
+const User = require('../app/models/user');
 
 
 module.exports = function (passport) {
@@ -150,6 +154,37 @@ module.exports = function (passport) {
               id,
               token: accessToken,
               email: emails[0].value,
+              name: `${displayName}`
+            }
+          };
+          const newUser = new User(user);
+          newUser.save((err, user) => {
+            if (err) {
+              return done(err);
+            } else {
+              return done(null, newUser);
+            }
+          })
+        }
+      })
+    }
+  ))
+  
+  passport.use('github', new GithubStrategy(
+    githubAuth,
+    function (accessToken, refreshToken, profile, done) {
+      User.findOne({'github.id': profile.id }, (err, user) => {
+        if (err) {
+          return done(err);
+        } else if (user) {
+          return done(null, user);
+        } else {
+          const { id, displayName, emails, profileUrl } = profile;
+          const user = {
+            github: {
+              id,
+              token: accessToken,
+              email: emails ? emails[0].value : profileUrl,
               name: `${displayName}`
             }
           };

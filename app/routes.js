@@ -94,6 +94,24 @@ module.exports = (app, passport) => {
        failureFlash: true
      })
    )
+
+   // Send the user to github for authentication
+   app.get('/auth/github',
+     passport.authenticate('github', {
+       // We need data from the user's profile
+       // so we pass in the scope option
+      //  scope: ['profile', 'email']
+     })
+   );
+
+   // Redirect URL we passed to passport google strategy middleware
+   app.get('/auth/github/callback',
+     passport.authenticate('github', {
+       successRedirect: '/profile',
+       failureRedirect: '/',
+       failureFlash: true
+     })
+   )
 }
 
 

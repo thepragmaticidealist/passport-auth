@@ -43,7 +43,7 @@ const userSchema = new Schema({
       type: 'String'
     }
   },
-  twitter: {
+  github: {
     id: {
       type: 'String'
     },
