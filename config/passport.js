@@ -106,27 +106,82 @@ module.exports = function (passport) {
   )
 
   passport.use('facebook', new FacebookStrategy(
-    facebookAuth,
-    function (accessToken, refreshToken, profile, done) {
-      User.findOne({ 'facebook.id' : profile.id }, (err, user) => {
-        if (err) {
-          return done(err);
-        } else {
-          if (user) {
+    Object.assign({}, facebookAuth, { passReqToCallback: true }),
+    function (req, accessToken, _refreshToken, profile, done) {
+      // User not logged in
+      if (!req.user) {
+        User.findOne({ 'facebook.id' : profile.id }, (err, user) => {
+          if (err) {
+            return done(err);
+          } else {
+            if (user) {
+              return done(null, user);
+            } else {
+              // Create the user
+              //http://www.passportjs.org/docs/profile/
+              const { id, name, emails } = profile;
+              const user = {
+                facebook : {
+                id,
+                token: accessToken,
+                email: emails[0].value,
+                name: `${name.givenName} ${name.familyName}`
+              }}
+              const newUser = new User(user);
+              newUser.save((err, _user) => {
+                if (err) {
+                  return done(err);
+                } else {
+                  return done(null, newUser);
+                }
+              })
+            }
+          }
+        })
+      } else {
+        // User already looged in, connect their account
+        const  { emails, name, id } = profile;
+        const user = Object.assign({}, req.user, {
+          facebook: {
+            id,
+            token: accessToken,
+            email: emails[0].value,
+            name: `${name.givenName} ${name.familyName}`
+          }
+        })
+        const newUser = new User(user);
+        newUser.save((err, _user) => {
+          if (err) {
+            return done(err);
+          } else {
+            return done(null, newUser);
+          }
+        })
+      }
+    }
+  ));
+
+  passport.use('google', new GoogleStrategy(
+    Object.assign({}, googleAuth, { passReqToCallback: true }),
+    function (req, accessToken, _refreshToken, profile, done) {
+      if (!req.user) {
+        User.findOne({'google.id': profile.id }, (err, user) => {
+          if (err) {
+            return done(err);
+          } else if (user) {
             return done(null, user);
           } else {
-            // Create the user
-            //http://www.passportjs.org/docs/profile/
-            const { id, name, emails } = profile;
+            const { id, displayName, emails } = profile;
             const user = {
-              facebook : {
-              id,
-              token: accessToken,
-              email: emails[0].value,
-              name: `${name.givenName} ${name.familyName}`
-            }}
+              google: {
+                id,
+                token: accessToken,
+                email: emails[0].value,
+                name: `${displayName}`
+              }
+            };
             const newUser = new User(user);
-            newUser.save((err, user) => {
+            newUser.save((err, _user) => {
               if (err) {
                 return done(err);
               } else {
@@ -134,70 +189,77 @@ module.exports = function (passport) {
               }
             })
           }
-        }
-      })
+        })
+      } else {
+        const { id, displayName, emails } = profile;
+        const user = Object.assign({}, req.user, {
+          google: {
+            id,
+            token: accessToken,
+            email: emails[0].value,
+            name: `${displayName}`
+          }
+        });
+        const newUser = new User(user);
+        newUser.save((err, _user) => {
+          if (err) {
+            return done(err);
+          } else {
+            return done(null, newUser);
+          }
+        })
+      }
     }
-  ))
-
-  passport.use('google', new GoogleStrategy(
-    googleAuth,
-    function (accessToken, refreshToken, profile, done) {
-      User.findOne({'google.id': profile.id }, (err, user) => {
-        if (err) {
-          return done(err);
-        } else if (user) {
-          return done(null, user);
-        } else {
-          const { id, displayName, emails } = profile;
-          const user = {
-            google: {
-              id,
-              token: accessToken,
-              email: emails[0].value,
-              name: `${displayName}`
-            }
-          };
-          const newUser = new User(user);
-          newUser.save((err, user) => {
-            if (err) {
-              return done(err);
-            } else {
-              return done(null, newUser);
-            }
-          })
-        }
-      })
-    }
-  ))
+  ));
   
   passport.use('github', new GithubStrategy(
-    githubAuth,
-    function (accessToken, refreshToken, profile, done) {
-      User.findOne({'github.id': profile.id }, (err, user) => {
-        if (err) {
-          return done(err);
-        } else if (user) {
-          return done(null, user);
-        } else {
-          const { id, displayName, emails, profileUrl } = profile;
-          const user = {
+    Object.assign({}, githubAuth, { passReqToCallback: true }),
+    function (req, accessToken, _refreshToken, profile, done) {
+      if (!req.user) {
+        User.findOne({'github.id': profile.id }, (err, user) => {
+          if (err) {
+            return done(err);
+          } else if (user) {
+            return done(null, user);
+          } else {
+            const { id, displayName, emails, profileUrl } = profile;
+            const user = {
+              github: {
+                id,
+                token: accessToken,
+                email: emails ? emails[0].value : profileUrl,
+                name: `${displayName}`
+              }
+            };
+            const newUser = new User(user);
+            newUser.save((err, _user) => {
+              if (err) {
+                return done(err);
+              } else {
+                return done(null, newUser);
+              }
+            })
+          }
+        })
+      } else {
+        const { id, displayName, emails, profileUrl } = profile;
+          const user = Object.assign({}, req.user, {
             github: {
               id,
               token: accessToken,
               email: emails ? emails[0].value : profileUrl,
               name: `${displayName}`
             }
-          };
+          });
           const newUser = new User(user);
-          newUser.save((err, user) => {
+          newUser.save((err, _user) => {
             if (err) {
               return done(err);
             } else {
               return done(null, newUser);
             }
           })
-        }
-      })
+      }
     }
-  ))
+  ));
 }
