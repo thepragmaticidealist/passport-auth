@@ -42,6 +42,23 @@ module.exports = (app, passport) => {
     })
   );
 
+    // Authorise local a/c
+  app.get('/auth/local/connect', (req, res, next) => {
+    res.render('connect-local.ejs', {
+      message: req.flash('loginMessage')
+    });
+  });
+
+
+  app.post('/auth/local/connect',
+    // passport auth middleware
+    passport.authorize('local-signup', {
+      successRedirect: '/profile',
+      failureRedirect: '/connect/local',
+      failureFlash: true // Flash error message given by the verify callback
+    })
+  );
+
   // Only allow logged in users to visit/get this page
   // We use the middleware function authenticationCheck to evaluate this
   app.get('/profile', authenticationCheck, (req, res, next) => {
@@ -76,6 +93,28 @@ module.exports = (app, passport) => {
     })
   );
 
+  // Authorise fb to connect a/c
+
+  // Send to fb for authorization
+  app.get('/auth/facebook/connect',
+    passport.authorize('facebook', {
+      // We need additional permission for profile info
+      // so we pass in the scope option
+      scope: ['public_profile', 'email'],
+      // re-ask for for declined permissions
+      authType: 'reauthenticate'
+    })
+  );
+  
+  // Callback from fb on successful authorization
+  app.get('/auth/facebook/connect/callback',
+    passport.authorize('facebook', {
+      successRedirect: '/profile',
+      failureRedirect: '/',
+      failureFlash: true
+    })
+  )
+
    // Send the user to google for authentication
    app.get('/auth/google',
      passport.authenticate('google', {
@@ -89,6 +128,25 @@ module.exports = (app, passport) => {
    // Redirect URL we passed to passport google strategy middleware
    app.get('/auth/google/callback',
      passport.authenticate('google', {
+       successRedirect: '/profile',
+       failureRedirect: '/',
+       failureFlash: true
+     })
+   )
+
+
+   // Send to google to authorize
+   app.get('/auth/google/connect',
+     passport.authorize('google', {
+       scope: ['public_profile', 'email'],
+       // re-ask for for declined permissions
+       authType: 'reauthenticate'
+     })
+   )
+
+  // Redirect from google
+   app.get('/auth/google/connect/callback',
+     passport.authorize('google', {
        successRedirect: '/profile',
        failureRedirect: '/',
        failureFlash: true
