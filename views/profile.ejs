@@ -29,7 +29,7 @@
         <div class="well">
           <h3><span class="fa fa-user"></span> Local</h3>
 
-          <%if (user.local && user.local.email) {%)
+          <%if (user.local && user.local.email) { %>
 
             <p>
               <strong>id</strong>: <%= user._id %><br>
@@ -90,7 +90,7 @@
               <strong>id</strong>: <%= user.google.id %><br>
               <strong>token</strong>: <%= user.google.token %><br>
               <strong>email</strong>: <%= user.google.email %><br>
-              <strong>name</strong>: <%= user.google.name %> -->
+              <strong>name</strong>: <%= user.google.name %>
             </p>
 
             <a href="/unlink/google" class="btn btn-info">Unlink</a>

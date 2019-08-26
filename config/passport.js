@@ -38,35 +38,53 @@ module.exports = function (passport) {
   // Verify callback, called when passport authenticates a request
   // Find user that matches credentials
   function (req, email, password, done) {
-    User.findOne({ 'local.email': email }, (err, user) => {
+    if (!req.user) {
+      console.log('>>>>>>>>>>> no user')
+      User.findOne({ 'local.email': email }, (err, user) => {
+          if (err) {
+            return done(err);
+          } else {
+            // Check if user exists
+            if (user) {
+              // No error, no data, set flash message
+              return done(null, false, req.flash('signupMessage', 'That email is already taken.'))
+            } else {
+              // Create the user
+              // Mongoose will invoke bcrypt to hash the password before saving
+              const newUser = new User({
+                local: {
+                  email,
+                  password
+                }
+              });
+              newUser.save((err) => {
+                if (err) {
+                  console.log('Error saving user', err)
+                  return done(err);
+                } else {
+                  return done(null, newUser);
+                }
+              })
+            }
+          }
+        })
+    } else {
+      console.log('USER PRESENT', req.user);
+      // Link user to a/c
+      const user = req.user;
+      const localCreds = {
+        email
+      }
+      user.local = localCreds;
+      user.save((err, _user) => {
         if (err) {
           return done(err);
         } else {
-          // Check if user exists
-          if (user) {
-            // No error, no data, set flash message
-            return done(null, false, req.flash('signupMessage', 'That email is already taken.'))
-          } else {
-            // Create the user
-            // Mongoose will invoke bcrypt to hash the password before saving
-            const newUser = new User({
-              local: {
-                email,
-                password
-              }
-            });
-            newUser.save((err) => {
-              if (err) {
-                console.log('Error saving user', err)
-                return done(err);
-              } else {
-                return done(null, newUser);
-              }
-            })
-          }
+          return done(null, user);
         }
       })
-    })
+    }
+  })
   )
 
   // Local login strategy
@@ -126,7 +144,7 @@ module.exports = function (passport) {
                 token: accessToken,
                 email: emails[0].value,
                 name: `${name.givenName} ${name.familyName}`
-              }}
+              }};
               const newUser = new User(user);
               newUser.save((err, _user) => {
                 if (err) {
@@ -141,20 +159,19 @@ module.exports = function (passport) {
       } else {
         // User already looged in, connect their account
         const  { emails, name, id } = profile;
-        const user = Object.assign({}, req.user, {
-          facebook: {
-            id,
-            token: accessToken,
-            email: emails[0].value,
-            name: `${name.givenName} ${name.familyName}`
-          }
-        })
-        const newUser = new User(user);
-        newUser.save((err, _user) => {
+        const user = req.user; // Current user object in session
+        const facebookCreds = {
+          id,
+          token: accessToken,
+          email: emails[0].value,
+          name: `${name.givenName} ${name.familyName}`
+        }
+        user.facebook = facebookCreds;
+        user.save((err, _user) => {
           if (err) {
             return done(err);
           } else {
-            return done(null, newUser);
+            return done(null, user);
           }
         })
       }
@@ -192,20 +209,19 @@ module.exports = function (passport) {
         })
       } else {
         const { id, displayName, emails } = profile;
-        const user = Object.assign({}, req.user, {
-          google: {
-            id,
-            token: accessToken,
-            email: emails[0].value,
-            name: `${displayName}`
-          }
-        });
-        const newUser = new User(user);
-        newUser.save((err, _user) => {
+        const user = req.user;
+        const googleCreds = {
+          id,
+          token: accessToken,
+          email: emails[0].value,
+          name: `${displayName}`
+        };
+        user.google = googleCreds;
+        user.save((err, _user) => {
           if (err) {
             return done(err);
           } else {
-            return done(null, newUser);
+            return done(null, user);
           }
         })
       }
@@ -243,20 +259,19 @@ module.exports = function (passport) {
         })
       } else {
         const { id, displayName, emails, profileUrl } = profile;
-          const user = Object.assign({}, req.user, {
-            github: {
-              id,
-              token: accessToken,
-              email: emails ? emails[0].value : profileUrl,
-              name: `${displayName}`
-            }
-          });
-          const newUser = new User(user);
-          newUser.save((err, _user) => {
+          const user = req.user;
+          const githubCreds = {
+            id,
+            token: accessToken,
+            email: emails ? emails[0].value : profileUrl,
+            name: `${displayName}`
+          };
+          user.github = githubCreds;
+          user.save((err, _user) => {
             if (err) {
               return done(err);
             } else {
-              return done(null, newUser);
+              return done(null, user);
             }
           })
       }

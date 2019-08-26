@@ -2,12 +2,12 @@
 
 module.exports = (app, passport) => {
 
-  app.get('/', (req, res, next) => {
+  app.get('/', (_req, res, _next) => {
     res.render('index.ejs');
   });
 
   // Handle get requests to /login
-  app.get('/login', (req, res, next) => {
+  app.get('/login', (req, res, _next) => {
     // all requests will have a req.flash()
     // pass a local variable i.e. the login flash message to the view
     res.render('login.ejs', { 
@@ -26,7 +26,7 @@ module.exports = (app, passport) => {
     })
   );
 
-  app.get('/signup', (req, res, next) => {
+  app.get('/signup', (req, res, _next) => {
     // render the page and pass in any flash data if it exists
     res.render('signup.ejs', {
       message: req.flash('signupMessage')
@@ -42,8 +42,10 @@ module.exports = (app, passport) => {
     })
   );
 
-    // Authorise local a/c
-  app.get('/auth/local/connect', (req, res, next) => {
+  // CONNECT LOCAL A/C
+
+  // Authorise local a/c
+  app.get('/auth/local/connect', (req, res, _next) => {
     res.render('connect-local.ejs', {
       message: req.flash('loginMessage')
     });
@@ -54,23 +56,26 @@ module.exports = (app, passport) => {
     // passport auth middleware
     passport.authorize('local-signup', {
       successRedirect: '/profile',
-      failureRedirect: '/connect/local',
+      failureRedirect: '/auth/local/connect',
       failureFlash: true // Flash error message given by the verify callback
     })
   );
 
   // Only allow logged in users to visit/get this page
   // We use the middleware function authenticationCheck to evaluate this
-  app.get('/profile', authenticationCheck, (req, res, next) => {
+  app.get('/profile', authenticationCheck, (req, res, _next) => {
     res.render('profile.ejs', {
       user: req.user // Pass authenticated user from passport to our profile page template
     });
   });
 
-  app.get('/logout', (req, res, next) => {
+  app.get('/logout', (req, res, _next) => {
     req.logout(); // Provided by passport
     res.redirect('/');
   });
+
+  // -----------------------
+  // AUTHENTICATE WITH FACEBOOK
 
   // Send the user to fb for authentication
   app.get('/auth/facebook', 
@@ -93,7 +98,8 @@ module.exports = (app, passport) => {
     })
   );
 
-  // Authorise fb to connect a/c
+
+  // CONNECT FACEBOOK A/C
 
   // Send to fb for authorization
   app.get('/auth/facebook/connect',
@@ -115,6 +121,10 @@ module.exports = (app, passport) => {
     })
   )
 
+
+  // ------------------
+  // AUTHETICATE WITH GOOGLE
+  
    // Send the user to google for authentication
    app.get('/auth/google',
      passport.authenticate('google', {
@@ -134,6 +144,8 @@ module.exports = (app, passport) => {
      })
    )
 
+   // ------------------
+  // AUTHORIZE GOOGLE A/C
 
    // Send to google to authorize
    app.get('/auth/google/connect',
@@ -153,6 +165,10 @@ module.exports = (app, passport) => {
      })
    )
 
+
+  // ------------------
+  // AUTHETICATE WITH GITHUB
+
    // Send the user to github for authentication
    app.get('/auth/github',
      passport.authenticate('github', {
@@ -162,9 +178,30 @@ module.exports = (app, passport) => {
      })
    );
 
+
    // Redirect URL we passed to passport google strategy middleware
    app.get('/auth/github/callback',
      passport.authenticate('github', {
+       successRedirect: '/profile',
+       failureRedirect: '/',
+       failureFlash: true
+     })
+   )
+
+   // CONNECT GITHUB A/C
+  
+   // Send the user to github for authentication
+   app.get('/auth/github/connect',
+     passport.authorize('github', {
+       // We need data from the user's profile
+       // so we pass in the scope option
+      //  scope: ['profile', 'email']
+     })
+   );
+
+   // Redirect URL we passed to passport google strategy middleware
+   app.get('/auth/github/connect/callback',
+     passport.authorize('github', {
        successRedirect: '/profile',
        failureRedirect: '/',
        failureFlash: true
