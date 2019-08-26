@@ -1,9 +1,10 @@
 module.exports = {
   local: (req, res, _next) => {
+    console.log('REQ', req.user)
     const user = req.user;
-    user.email = null;
-    user.password = null;
-    newUser.save(err => {
+    user.local.email = null;
+    user.local.password = null;
+    user.save(err => {
       res.redirect('/profile')
     })
   },
@@ -11,7 +12,7 @@ module.exports = {
   facebook: (req, res, _next) => {
     const user = req.user;
     user.facebook.token = null;
-    newUser.save(err => {
+    user.save(err => {
       res.redirect('/profile')
     })
   },
@@ -19,7 +20,7 @@ module.exports = {
   google: (req, res, _next) => {
     const user = req.user;
     user.google.token = null;
-    newUser.save(err => {
+    user.save(err => {
       res.redirect('/profile')
     })
   },
@@ -27,7 +28,7 @@ module.exports = {
   github: (req, res, _next) => {
     const user = req.user;
     user.github.token = null;
-    newUser.save(err => {
+    user.save(err => {
       res.redirect('/profile')
     })
   }

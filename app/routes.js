@@ -58,7 +58,7 @@ module.exports = (app, passport) => {
     // passport auth middleware
     passport.authorize('local-signup', {
       successRedirect: '/profile',
-      failureRedirect: '/auth/local/connect',
+      failureRedirect: '/',
       failureFlash: true // Flash error message given by the verify callback
     })
   );
@@ -158,7 +158,7 @@ module.exports = (app, passport) => {
    // Send to google to authorize
    app.get('/auth/google/connect',
      passport.authorize('google', {
-       scope: ['public_profile', 'email'],
+       scope: ['profile', 'email'],
        // re-ask for for declined permissions
        authType: 'reauthenticate'
      })

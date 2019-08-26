@@ -37,7 +37,7 @@
               <strong>password</strong>: <%= user.local.password %>
             </p>
 
-            <a href="/unlink/local" class="btn btn-default">Unlink</a>
+            <a href="auth/local/unlink" class="btn btn-default">Unlink</a>
 
            <% } else { %>
             <a href="auth/local/connect" class="btn btn-default">Connect Local</a>
@@ -65,7 +65,7 @@
               <strong>name</strong>: <%= user.facebook.name %>
             </p>
 
-            <a href="/unlink/facebook" class="btn btn-primary">Unlink</a>
+            <a href="auth/facebook/unlink" class="btn btn-primary">Unlink</a>
           <% } else { %>
             <a href="/auth/facebook/connect" class="btn btn-primary">Connect Facebook</a>
           <% } %>
@@ -93,7 +93,7 @@
               <strong>name</strong>: <%= user.google.name %>
             </p>
 
-            <a href="/unlink/google" class="btn btn-info">Unlink</a>
+            <a href="auth/google/unlink" class="btn btn-info">Unlink</a>
           <% } else { %>
             <a href="/auth/google/connect" class="btn btn-info">Connect Google</a>
           <% } %>
@@ -119,7 +119,7 @@
               <strong>name</strong>: <%= user.github.name %>
             </p>
 
-            <a href="/unlink/github" class="btn btn-info">Unlink</a>
+            <a href="auth/github/unlink" class="btn btn-info">Unlink</a>
           <% } else { %>
             <a href="/auth/github/connect" class="btn btn-info">Connect Github</a>
           <% } %>
