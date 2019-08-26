@@ -1,3 +1,5 @@
+const unlink = require('../config/unlink');
+
 // Route managing niddleware function
 
 module.exports = (app, passport) => {
@@ -61,6 +63,9 @@ module.exports = (app, passport) => {
     })
   );
 
+  // ULINK LOCAL A/C
+  app.get('/auth/local/unlink', unlink.local);
+
   // Only allow logged in users to visit/get this page
   // We use the middleware function authenticationCheck to evaluate this
   app.get('/profile', authenticationCheck, (req, res, _next) => {
@@ -121,6 +126,9 @@ module.exports = (app, passport) => {
     })
   )
 
+  // ULINK FACEBOOK A/C
+  app.get('/auth/facebook/unlink', unlink.facebook);
+
 
   // ------------------
   // AUTHETICATE WITH GOOGLE
@@ -165,6 +173,9 @@ module.exports = (app, passport) => {
      })
    )
 
+   // ULINK GOOGLE A/C
+   app.get('/auth/google/unlink', unlink.google);
+
 
   // ------------------
   // AUTHETICATE WITH GITHUB
@@ -207,6 +218,9 @@ module.exports = (app, passport) => {
        failureFlash: true
      })
    )
+
+   // ULINK GITHUB A/C
+   app.get('/auth/github/unlink', unlink.github);
 }
 
 
