@@ -8,6 +8,7 @@ const {
   githubAuth
 } = require('../config/auth');
 const User = require('../app/models/user');
+const bcrypt = require('bcrypt');
 
 
 module.exports = function (passport) {
@@ -39,7 +40,6 @@ module.exports = function (passport) {
   // Find user that matches credentials
   function (req, email, password, done) {
     if (!req.user) {
-      console.log('>>>>>>>>>>> no user')
       User.findOne({ 'local.email': email }, (err, user) => {
           if (err) {
             return done(err);
@@ -69,15 +69,18 @@ module.exports = function (passport) {
           }
         })
     } else {
-      console.log('USER PRESENT', req.user);
       // Link user to a/c
       const user = req.user;
+      // Hash password
       const localCreds = {
-        email
+        email,
+        password: bcrypt.hashSync(password, 10)
       }
       user.local = localCreds;
+      console.log('USER', user)
       user.save((err, _user) => {
         if (err) {
+          console.log('ERR', err)
           return done(err);
         } else {
           return done(null, user);
@@ -133,6 +136,22 @@ module.exports = function (passport) {
             return done(err);
           } else {
             if (user) {
+              if (!user.facebook.token) {
+                const { name, emails } = profile;
+                const facebookCreds = {
+                  token: accessToken,
+                  email: emails[0].value,
+                  name: `${name.givenName} ${name.familyName}`
+                }
+                user.facebook = facebookCreds;
+                user.save((err, _user) => {
+                  if (err) {
+                    return done(err);
+                  } else {
+                    return done(null, user);
+                  }
+                })
+              }
               return done(null, user);
             } else {
               // Create the user
@@ -186,6 +205,22 @@ module.exports = function (passport) {
           if (err) {
             return done(err);
           } else if (user) {
+             if (!user.google.token) {
+               const { displayName, emails } = profile;
+               const googleCreds = {
+                 token: accessToken,
+                 email: emails[0].value,
+                 name: `${displayName}`
+               }
+               user.google = googleCreds;
+               user.save((err, _user) => {
+                 if (err) {
+                   return done(err);
+                 } else {
+                   return done(null, user);
+                 }
+               })
+             }
             return done(null, user);
           } else {
             const { id, displayName, emails } = profile;
@@ -236,6 +271,22 @@ module.exports = function (passport) {
           if (err) {
             return done(err);
           } else if (user) {
+             if (!user.github.token) {
+               const { displayName, emails, profileUrl } = profile;
+               const githubCreds = {
+                 token: accessToken,
+                 email: emails ? emails[0].value : profileUrl,
+                 name: `${displayName}`
+               }
+               user.github = githubCreds;
+               user.save((err, _user) => {
+                 if (err) {
+                   return done(err);
+                 } else {
+                   return done(null, user);
+                 }
+               })
+             }
             return done(null, user);
           } else {
             const { id, displayName, emails, profileUrl } = profile;
