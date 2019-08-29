@@ -53,10 +53,9 @@ module.exports = (app, passport) => {
     });
   });
 
-
   app.post('/auth/local/connect',
     // passport auth middleware
-    passport.authorize('local-signup', {
+    passport.authenticate('local-signup', {
       successRedirect: '/profile',
       failureRedirect: '/',
       failureFlash: true // Flash error message given by the verify callback

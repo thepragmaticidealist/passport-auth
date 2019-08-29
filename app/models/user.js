@@ -59,29 +59,11 @@ const userSchema = new Schema({
   },
 });
 
-// encrypt password before save
-userSchema.pre('save', function (next) {
-  const user = this;
-  if (!user.isModified || !user.isNew) { // Don't rehash if it's an old user
-    next();
-  } else if (!user.hasOwnProperty('local')) { // Don't hash if the user is local
-    next();
-  } else {
-    bcrypt.hash(user.local.password, saltingRounds, function (err, hash) {
-      if (err) {
-        console.log('Error hashing password for user', user.email);
-        next(err);
-      } else {
-        user.local.password = hash;
-        next();
-      }
-    });
-  }
-});
 
 // Returns a promise that resolves to true if a password is valid
 userSchema.methods.validPassword = function (password) {
   return bcrypt.compare(password, this.local.password);
 }
+
 
 module.exports = mongoose.model('User', userSchema);

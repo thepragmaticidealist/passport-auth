@@ -1,4 +1,6 @@
 const LocalStrategy = require('passport-local').Strategy;
+const bcrypt = require('bcrypt');
+
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const GithubStrategy = require('passport-github').Strategy;
@@ -8,7 +10,6 @@ const {
   githubAuth
 } = require('../config/auth');
 const User = require('../app/models/user');
-const bcrypt = require('bcrypt');
 
 
 module.exports = function (passport) {
@@ -50,19 +51,18 @@ module.exports = function (passport) {
               return done(null, false, req.flash('signupMessage', 'That email is already taken.'))
             } else {
               // Create the user
-              // Mongoose will invoke bcrypt to hash the password before saving
-              const newUser = new User({
-                local: {
-                  email,
-                  password
-                }
-              });
-              newUser.save((err) => {
+              const newUser = new User();
+              const details = {
+                email,
+                password: bcrypt.hashSync(password, 10)
+              };
+              newUser.local = details;
+              newUser.save((err, user) => {
                 if (err) {
                   console.log('Error saving user', err)
                   return done(err);
                 } else {
-                  return done(null, newUser);
+                  return done(null, user);
                 }
               })
             }
@@ -77,10 +77,8 @@ module.exports = function (passport) {
         password: bcrypt.hashSync(password, 10)
       }
       user.local = localCreds;
-      console.log('USER', user)
       user.save((err, _user) => {
         if (err) {
-          console.log('ERR', err)
           return done(err);
         } else {
           return done(null, user);

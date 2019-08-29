@@ -37,6 +37,7 @@
               <strong>password</strong>: <%= user.local.password %>
             </p>
 
+            <!-- Unlink only if not the only login strategy -->
             <a href="auth/local/unlink" class="btn btn-default">Unlink</a>
 
            <% } else { %>
@@ -52,7 +53,7 @@
 
       <div class="col-sm-6">
         <div class="well">
-          <h3 class="text-primary"><span class="fa fa-facebook"></span> Facebook</h3> -->
+          <h3 class="text-primary"><span class="fa fa-facebook"></span> Facebook</h3>
 
           <!-- check if the user has this token (is the user authenticated with this social account) -->
           <% if (user.facebook.token) { %>
