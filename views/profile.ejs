@@ -38,7 +38,12 @@
             </p>
 
             <!-- Unlink only if not the only login strategy -->
-            <a href="auth/local/unlink" class="btn btn-default">Unlink</a>
+            <% if (user.currentAuthenticationMethod !== 'local') { %>
+              <a href="auth/local/unlink" class="btn btn-default">Unlink</a>
+            <% } else { %>
+              <!-- CAN'T UNLINK -->
+              <a href="" class="btn btn-default disabled">Unlink</a>
+            <% } %>
 
            <% } else { %>
             <a href="auth/local/connect" class="btn btn-default">Connect Local</a>
@@ -66,7 +71,11 @@
               <strong>name</strong>: <%= user.facebook.name %>
             </p>
 
-            <a href="auth/facebook/unlink" class="btn btn-primary">Unlink</a>
+            <% if (user.currentAuthenticationMethod !== 'facebook') { %>
+              <a href="auth/facebook/unlink" class="btn btn-primary">Unlink</a>
+            <% } else { %>
+              <a href="" class="btn btn-primary disabled">Unlink</a> 
+              <% } %>
           <% } else { %>
             <a href="/auth/facebook/connect" class="btn btn-primary">Connect Facebook</a>
           <% } %>
@@ -93,8 +102,12 @@
               <strong>email</strong>: <%= user.google.email %><br>
               <strong>name</strong>: <%= user.google.name %>
             </p>
-
-            <a href="auth/google/unlink" class="btn btn-info">Unlink</a>
+            <% if (user.currentAuthenticationMethod !== 'google') { %>
+              <a href="auth/google/unlink" class="btn btn-info">Unlink</a>
+            <% } else { %>
+              <!-- CAN'T UNLINK -->
+              <a href="" class="btn btn-info disabled">Unlink</a>
+            <% } %>
           <% } else { %>
             <a href="/auth/google/connect" class="btn btn-info">Connect Google</a>
           <% } %>
@@ -119,8 +132,12 @@
               <strong>email</strong>: <%= user.github.email %><br>
               <strong>name</strong>: <%= user.github.name %>
             </p>
-
-            <a href="auth/github/unlink" class="btn btn-info">Unlink</a>
+            <% if (user.currentAuthenticationMethod !== 'github') { %>
+              <a href="auth/github/unlink" class="btn btn-info">Unlink</a>
+            <% } else { %>
+              <!-- CAN'T UNLINK -->
+              <a href="" class="btn btn-info disabled">Unlink</a>
+            <% } %>
           <% } else { %>
             <a href="/auth/github/connect" class="btn btn-info">Connect Github</a>
           <% } %>
