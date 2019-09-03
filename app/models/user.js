@@ -1,19 +1,18 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const saltingRounds = 10;
-
 // schema maps to a collection, defines attributes of documents within collection
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
+  currentAuthenticationMethod: 'String',
   local: {
     email: {
       type: 'String'
     },
     password: {
       type: 'String'
-    }
+    },
   },
   google: {
     id: {
