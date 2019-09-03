@@ -48,7 +48,7 @@ module.exports = function (passport) {
             // Check if user exists
             if (user) {
               // No error, no data, set flash message
-              return done(null, false, req.flash('signupMessage', 'That email is already taken.'))
+              return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
             } else {
               // Create the user
               const newUser = new User();
@@ -57,11 +57,13 @@ module.exports = function (passport) {
                 password: bcrypt.hashSync(password, 10)
               };
               newUser.local = details;
+              // Pass a flag that sets up that method of auth as the current one being used
+              newUser.currentAuthenticationMethod = 'local';
               newUser.save((err, user) => {
                 if (err) {
-                  console.log('Error saving user', err)
                   return done(err);
                 } else {
+                  console.log('LOCAL SIGNUP USER, NO SESSION &&&&', user)
                   return done(null, user);
                 }
               })
@@ -77,10 +79,12 @@ module.exports = function (passport) {
         password: bcrypt.hashSync(password, 10)
       }
       user.local = localCreds;
+      user.currentAuthenticationMethod = 'local';
       user.save((err, _user) => {
         if (err) {
           return done(err);
         } else {
+          console.log('LOCAL USER ####', user);
           return done(null, user);
         }
       })
@@ -116,6 +120,8 @@ module.exports = function (passport) {
             } else {
               // Success, pass user to passport to attach to req.user
               // User passed to serializeUser fx to authenticate succeeding requests
+              // Pass attrib to det current auth method
+              user.currentAuthenticationMethod = 'local';
               return done(null, user);
             }
           }
@@ -134,6 +140,7 @@ module.exports = function (passport) {
             return done(err);
           } else {
             if (user) {
+              // Previously unlinked a/c
               if (!user.facebook.token) {
                 const { name, emails } = profile;
                 const facebookCreds = {
@@ -142,14 +149,19 @@ module.exports = function (passport) {
                   name: `${name.givenName} ${name.familyName}`
                 }
                 user.facebook = facebookCreds;
+                user.currentAuthenticationMethod = 'facebook';
                 user.save((err, _user) => {
                   if (err) {
                     return done(err);
                   } else {
+                    console.log('FACEBOOK USER PREVIOUSLY LINKED >>>', user)
                     return done(null, user);
                   }
                 })
               }
+              // Account still linked
+              user.currentAuthenticationMethod = 'facebook';
+              console.log('USER STILL LINKED ++++', user)
               return done(null, user);
             } else {
               // Create the user
@@ -163,10 +175,12 @@ module.exports = function (passport) {
                 name: `${name.givenName} ${name.familyName}`
               }};
               const newUser = new User(user);
+              newUser.currentAuthenticationMethod = 'facebook';
               newUser.save((err, _user) => {
                 if (err) {
                   return done(err);
                 } else {
+                  console.log('USER *****', newUser)
                   return done(null, newUser);
                 }
               })
@@ -184,6 +198,7 @@ module.exports = function (passport) {
           name: `${name.givenName} ${name.familyName}`
         }
         user.facebook = facebookCreds;
+        user.currentAuthenticationMethod = 'facebook';
         user.save((err, _user) => {
           if (err) {
             return done(err);
@@ -211,6 +226,7 @@ module.exports = function (passport) {
                  name: `${displayName}`
                }
                user.google = googleCreds;
+               user.currentAuthenticationMethod = 'google';
                user.save((err, _user) => {
                  if (err) {
                    return done(err);
@@ -219,6 +235,7 @@ module.exports = function (passport) {
                  }
                })
              }
+             user.currentAuthenticationMethod = 'google';
             return done(null, user);
           } else {
             const { id, displayName, emails } = profile;
@@ -231,6 +248,7 @@ module.exports = function (passport) {
               }
             };
             const newUser = new User(user);
+            newUser.currentAuthenticationMethod = 'google';
             newUser.save((err, _user) => {
               if (err) {
                 return done(err);
@@ -250,6 +268,7 @@ module.exports = function (passport) {
           name: `${displayName}`
         };
         user.google = googleCreds;
+        user.currentAuthenticationMethod = 'google';
         user.save((err, _user) => {
           if (err) {
             return done(err);
@@ -277,6 +296,7 @@ module.exports = function (passport) {
                  name: `${displayName}`
                }
                user.github = githubCreds;
+               user.currentAuthenticationMethod = 'github';
                user.save((err, _user) => {
                  if (err) {
                    return done(err);
@@ -285,6 +305,7 @@ module.exports = function (passport) {
                  }
                })
              }
+            user.currentAuthenticationMethod = 'github';
             return done(null, user);
           } else {
             const { id, displayName, emails, profileUrl } = profile;
@@ -297,6 +318,7 @@ module.exports = function (passport) {
               }
             };
             const newUser = new User(user);
+            newUser.currentAuthenticationMethod = 'github';
             newUser.save((err, _user) => {
               if (err) {
                 return done(err);
@@ -316,6 +338,7 @@ module.exports = function (passport) {
             name: `${displayName}`
           };
           user.github = githubCreds;
+          user.currentAuthenticationMethod = 'github';
           user.save((err, _user) => {
             if (err) {
               return done(err);
