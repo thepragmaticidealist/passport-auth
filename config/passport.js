@@ -63,7 +63,6 @@ module.exports = function (passport) {
                 if (err) {
                   return done(err);
                 } else {
-                  console.log('LOCAL SIGNUP USER, NO SESSION &&&&', user)
                   return done(null, user);
                 }
               })
@@ -134,6 +133,8 @@ module.exports = function (passport) {
     Object.assign({}, facebookAuth, { passReqToCallback: true }),
     function (req, accessToken, _refreshToken, profile, done) {
       // User not logged in
+      console.log('REQ.USER >>>>', req.user);
+      console.log('REQ.ACCOUNT >>>>', req.account);
       if (!req.user) {
         User.findOne({ 'facebook.id' : profile.id }, (err, user) => {
           if (err) {
